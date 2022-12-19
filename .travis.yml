@@ -5,14 +5,23 @@ services:
 # build a test version of our current project and run some tests
 # use dockerfile.dev
 before_install:
-  - docker build -t minhsiungw/react-test -f ./client/Dockerfile.dev ./client
+  - docker build -t mhsiungw/react-test -f ./client/Dockerfile.dev ./client
 
 # if exit with status other than 0, failed
 script:
-  - docker run -e CI=true minhsiungw/react-test npm test
+  - docker run -e CI=true mhsiungw/react-test npm test
 
 after_success:
-  - docker build -t minhsiungw/multi-client ./client
-  - docker build -t minhsiungw/multi-nginx ./nginx
-  - docker build -t minhsiungw/multi-server ./server
-  - docker build -t minhsiungw/multi-worker ./worker
+  - docker build -t mhsiungw/multi-client ./client
+  - docker build -t mhsiungw/multi-nginx ./nginx
+  - docker build -t mhsiungw/multi-server ./server
+  - docker build -t mhsiungw/multi-worker ./worker
+
+  # log in to the docker CLI => retrieve "$DOCKER_PASSWORD" and use it as input to the next command. --password-stdin tell docker cli to expect a password input
+  - echo "$DOCKER_PASSWORD" | docker login -u  "$DOCKER_ID" --password-stdin
+
+  # take those images and push them to docker hub
+  - docker push mhsiungw/multi-client
+  - docker push mhsiungw/multi-nginx
+  - docker push mhsiungw/multi-server
+  - docker push mhsiungw/multi-worker
